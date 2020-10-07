@@ -84,7 +84,7 @@ const makeDesign = (count, buf, next, successCb) => {
     }
 
     console.log('[INFO] Got design ID:', res.body.designId);
-    return successCb(err, res.body.designId);
+    return successCb(res.body.designId);
   });
 
   const form = r.form();
@@ -104,7 +104,7 @@ app.post('/order', (req, res, next) => {
   const artBuffer = Buffer.from(shirt.artwork.split(',')[1], 'base64');
 
   // CREATE DESIGNID
-  makeDesign(0, artBuffer, next, (err, designId) => {
+  makeDesign(0, artBuffer, next, (designId) => {
     // CREATE ORDERTOKEN
     request.post(
       {
