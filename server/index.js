@@ -60,108 +60,34 @@ const auth = {
   password: SP_AUTH,
 };
 
-app.post('/order', (req, res, next) => {
-  res.header('Content-Type', 'application/json');
-  const {shirt, address, stripeToken, email} = req.body;
 
-  // CREATE DESIGNID
-  const r = request.post(
-    {
-      url: `${SP_API}design`,
-      auth,
-      json: true,
-    },
-    (err, response) => {
-      if (err) {
-        return next(err);
-      } else if (response.body.statusCode > 300) {
-        console.log('[Design error]', response.body);
-        return next(response.body);
+
+const makeDesign = (count, buf, next, successCb) => {
+  const artBuffer = buf || Buffer.from(shirt.artwork.split(',')[1], 'base64');
+
+  var r = request.post({
+    url: SP_API + 'design',
+    auth,
+    json: true
+  }, function(err, res, body) {
+    if (err) {
+      return next(err);
+    }
+    if (res.statusCode !== 200) {
+      console.error('[BAD - SP] Design error: ', res.statusCode, JSON.stringify(body));
+      
+      if (count > 3) {
+        console.log('[BAD - SP] Design error, bailing:', JSON.stringify(body))
+        return next(body);
       } else {
-        // CREATE ORDERTOKEN
-        request.post(
-          {
-            url: `${SP_API}quote`,
-            auth,
-            body: {
-              type: 'dtg',
-              products: [
-                {
-                  id: PRODUCTS[shirt.style],
-                  color: shirt.style === 'fitted' ? 'Black' : 'Black',
-                  quantity: 1,
-                  size: SIZES[shirt.size],
-                },
-              ],
-              designId: response.body.designId,
-              address,
-            },
-            json: true,
-          },
-          (err, response) => {
-            if (err) {
-              return next(err);
-            } else if (
-              response.body.statusCode > 300 ||
-              (response.body.orderIssues && response.body.orderIssues.length)
-            ) {
-              console.log('[Quote error]', response.body);
-              return next(response.body);
-            } else {
-              // CREATE PAYMENT
-              stripe.charges.create(
-                {
-                  amount: 2250,
-                  currency: 'usd',
-                  card: stripeToken,
-                  receipt_email: email,
-                  description: `A datetime shirt (ID: ${response.body.orderToken})`,
-                },
-                (err, charge) => {
-                  if (err) {
-                    console.log('[Stripe error]', err);
-                    return next({
-                      error: {
-                        message: err.message,
-                        type: err.type,
-                        code: err.code,
-                      },
-                    });
-                  } else {
-                    // CREATE ORDERID
-                    request.post(
-                      {
-                        url: `${SP_API}order`,
-                        json: true,
-                        auth,
-                        body: {
-                          orderToken: response.body.orderToken,
-                        },
-                      },
-                      (err, response) => {
-                        console.log('ORDER', response.body);
-                        if (err) {
-                          return next(err);
-                        } else if (response.body.statusCode > 300) {
-                          console.log('[Order error]', response.body);
-                          return next(response.body);
-                        } else {
-                          res.json({order: response.body.orderId});
-                        }
-                      }
-                    );
-                  }
-                }
-              );
-            }
-          }
-        );
+        console.log('[BAD - SP] Design error, retrying:', JSON.stringify(body))
+        return makeDesign(count + 1, artBuffer, next, successCb);
       }
     }
-  );
 
-  const artUri = shirt.artwork;
-  const artBuffer = new Buffer(artUri.split(',')[1], 'base64');
+    console.log('[INFO] Got design ID:', res.body.designId);
+    return successCb(err, res.body.designId);
+  });
 
   const form = r.form();
   form.append('type', 'dtg');
@@ -172,6 +98,93 @@ app.post('/order', (req, res, next) => {
   form.append('sides[front][dimensions][width]', '8'); // inches
   form.append('sides[front][position][horizontal]', 'C');
   form.append('sides[front][position][offset][top]', '3'); // inches
+};
+
+app.post('/order', (req, res, next) => {
+  res.header('Content-Type', 'application/json');
+  const {shirt, address, stripeToken, email} = req.body;
+
+  // CREATE DESIGNID
+  makeDesign(x, y, next, (err, designId) => {
+    // CREATE ORDERTOKEN
+    request.post(
+      {
+        url: `${SP_API}quote`,
+        auth,
+        body: {
+          type: 'dtg',
+          products: [
+            {
+              id: PRODUCTS[shirt.style],
+              color: shirt.style === 'fitted' ? 'Black' : 'Black',
+              quantity: 1,
+              size: SIZES[shirt.size],
+            },
+          ],
+          designId,
+          address,
+        },
+        json: true,
+      },
+      (err, response) => {
+        if (err) {
+          return next(err);
+        } else if (
+          response.body.statusCode > 300 ||
+          (response.body.orderIssues && response.body.orderIssues.length)
+        ) {
+          console.log('[Quote error]', response.body);
+          return next(response.body);
+        } else {
+          // CREATE PAYMENT
+          stripe.charges.create(
+            {
+              amount: 2250,
+              currency: 'usd',
+              card: stripeToken,
+              receipt_email: email,
+              description: `A datetime shirt (ID: ${response.body.orderToken})`,
+            },
+            (err, charge) => {
+              if (err) {
+                console.log('[Stripe error]', err);
+                return next({
+                  error: {
+                    message: err.message,
+                    type: err.type,
+                    code: err.code,
+                  },
+                });
+              } else {
+                // CREATE ORDERID
+                request.post(
+                  {
+                    url: `${SP_API}order`,
+                    json: true,
+                    auth,
+                    body: {
+                      orderToken: response.body.orderToken,
+                    },
+                  },
+                  (err, response) => {
+                    console.log('ORDER', response.body);
+                    if (err) {
+                      return next(err);
+                    } else if (response.body.statusCode > 300) {
+                      console.log('[Order error]', response.body);
+                      return next(response.body);
+                    } else {
+                      res.json({order: response.body.orderId});
+                    }
+                  }
+                );
+              }
+            }
+          );
+        }
+      }
+    );
+  });
 });
 
 app.use('/static', express.static(path.join(__dirname, '../build/static')));
