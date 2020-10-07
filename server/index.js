@@ -63,8 +63,6 @@ const auth = {
 
 
 const makeDesign = (count, buf, next, successCb) => {
-  const artBuffer = buf || Buffer.from(shirt.artwork.split(',')[1], 'base64');
-
   var r = request.post({
     url: SP_API + 'design',
     auth,
@@ -81,7 +79,7 @@ const makeDesign = (count, buf, next, successCb) => {
         return next(body);
       } else {
         console.log('[BAD - SP] Design error, retrying:', JSON.stringify(body))
-        return makeDesign(count + 1, artBuffer, next, successCb);
+        return makeDesign(count + 1, buf, next, successCb);
       }
     }
 
@@ -91,7 +89,7 @@ const makeDesign = (count, buf, next, successCb) => {
 
   const form = r.form();
   form.append('type', 'dtg');
-  form.append('sides[front][artwork]', artBuffer, {
+  form.append('sides[front][artwork]', buf, {
     filename: 'artwork.png',
     contentType: 'image/png',
   });
@@ -103,9 +101,10 @@ const makeDesign = (count, buf, next, successCb) => {
 app.post('/order', (req, res, next) => {
   res.header('Content-Type', 'application/json');
   const {shirt, address, stripeToken, email} = req.body;
+  const artBuffer = Buffer.from(shirt.artwork.split(',')[1], 'base64');
 
   // CREATE DESIGNID
-  makeDesign(x, y, next, (err, designId) => {
+  makeDesign(0, artBuffer, next, (err, designId) => {
     // CREATE ORDERTOKEN
     request.post(
       {
