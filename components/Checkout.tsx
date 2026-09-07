@@ -113,8 +113,6 @@ export default function Checkout(props: CheckoutProps) {
           clientSecret,
           confirmParams: {
             return_url: returnUrl.toString(),
-            receipt_email: payerEmail,
-            shipping: { name: shipping.name, phone: shipping.phone, address: shipping.address },
           },
           redirect: "if_required",
         });
