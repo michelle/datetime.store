@@ -14,7 +14,8 @@ export const dynamic = "force-dynamic";
  * POST /api/checkout
  * Creates a PaymentIntent for one shirt. The client then confirms it with the
  * Payment Element / Express Checkout Element. Everything needed to fulfil the
- * order is stored on the PaymentIntent (shipping + metadata).
+ * order is stored on the PaymentIntent: product metadata here, and Stripe's
+ * native shipping field from the Address Element during confirmation.
  */
 export async function POST(req: Request) {
   if (!isSameOrigin(req)) return invalidOriginResponse();
@@ -29,7 +30,7 @@ export async function POST(req: Request) {
     throw err;
   }
 
-  const { style, size, timestamp, email, shipping } = input;
+  const { style, size, timestamp, email } = input;
 
   try {
     const intent = await stripe().paymentIntents.create(
@@ -38,11 +39,6 @@ export async function POST(req: Request) {
         currency: CURRENCY,
         automatic_payment_methods: { enabled: true },
         receipt_email: email,
-        shipping: {
-          name: shipping.name,
-          phone: shipping.phone,
-          address: shipping.address,
-        },
         description: `datetime.store — ${STYLE_LABELS[style]} ${size} shirt printed with ${timestamp} (${formatTimestampHuman(timestamp)})`,
         statement_descriptor_suffix: "DATETIME",
         metadata: {
