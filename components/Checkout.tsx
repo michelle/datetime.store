@@ -4,7 +4,6 @@ import { useCallback, useState, type FormEvent } from "react";
 import {
   AddressElement,
   ExpressCheckoutElement,
-  LinkAuthenticationElement,
   PaymentElement,
   useElements,
   useStripe,
@@ -281,8 +280,18 @@ export default function Checkout(props: CheckoutProps) {
           />
         </div>
         <div className="Checkout-section">
-          <p className="Checkout-section-title">{ORIGINAL_COPY.emailLabel}</p>
-          <LinkAuthenticationElement onChange={(e) => setEmail(e.value.email)} />
+          <label className="email-field">
+            <input
+              type="email"
+              name="email"
+              autoComplete="email"
+              value={email}
+              placeholder={ORIGINAL_COPY.emailPlaceholder}
+              onChange={(event) => setEmail(event.target.value)}
+              required
+            />
+            <span>{ORIGINAL_COPY.emailLabel}</span>
+          </label>
         </div>
         <div className="Checkout-section">
           <PaymentElement options={{ layout: "tabs", wallets: { link: "never" } }} onReady={() => setPaymentReady(true)} />

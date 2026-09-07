@@ -5,6 +5,7 @@ export const ORIGINAL_COPY = {
   tagline: "we sell a t-shirt with the current datetime.",
   manualCheckout: "Or enter details manually",
   emailLabel: "Email (for receipt)",
+  emailPlaceholder: "michelle@stripe.com",
   buy: "Buy now",
   processing: "Processing...",
   successTitle: "Congrats on your pretty cool shirt!",

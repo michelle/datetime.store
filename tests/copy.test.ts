@@ -9,6 +9,7 @@ test("customer-facing storefront copy stays verbatim to the original", () => {
     tagline: "we sell a t-shirt with the current datetime.",
     manualCheckout: "Or enter details manually",
     emailLabel: "Email (for receipt)",
+    emailPlaceholder: "michelle@stripe.com",
     buy: "Buy now",
     processing: "Processing...",
     successTitle: "Congrats on your pretty cool shirt!",

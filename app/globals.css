@@ -173,6 +173,30 @@ a {
   color: #666;
   margin: 0 0 10px;
 }
+
+.email-field {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 4px;
+  color: #555;
+  font-size: 13px;
+}
+
+.email-field input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--blue-light);
+  border-radius: 0;
+  padding: 10px 12px;
+  color: var(--black);
+  background: #fff;
+  font: 16px var(--font-ui);
+}
+
+.email-field input:focus {
+  border-color: var(--blue);
+  outline: 1px solid var(--blue);
+}
 .Checkout-express {
   margin-top: 20px;
 }
