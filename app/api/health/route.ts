@@ -11,8 +11,6 @@ export async function GET() {
     "STRIPE_WEBHOOK_SECRET",
     "PRODIGI_API_KEY",
     "PRODIGI_API_BASE",
-    "SITE_URL",
-    "SUPPORT_EMAIL",
   ] as const;
   const missing = required.filter((key) => !process.env[key]);
   const validAppEnv = process.env.APP_ENV === "sandbox" || process.env.APP_ENV === "production";
@@ -22,7 +20,8 @@ export async function GET() {
     : process.env.STRIPE_SECRET_KEY?.startsWith("sk_test_") && process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.startsWith("pk_test_");
   const expectedProdigiBase = live ? "https://api.prodigi.com/v4.0" : "https://api.sandbox.prodigi.com/v4.0";
   const prodigiModeMatches = process.env.PRODIGI_API_BASE === expectedProdigiBase;
-  const healthy = missing.length === 0 && validAppEnv && stripeModeMatches && prodigiModeMatches;
+  const canonicalOriginConfigured = !live || Boolean(process.env.SITE_URL);
+  const healthy = missing.length === 0 && validAppEnv && stripeModeMatches && prodigiModeMatches && canonicalOriginConfigured;
 
   return NextResponse.json(
     {
@@ -33,6 +32,7 @@ export async function GET() {
         appMode: validAppEnv,
         stripeMode: Boolean(stripeModeMatches),
         prodigiMode: prodigiModeMatches,
+        canonicalOrigin: canonicalOriginConfigured,
       },
       ...(missing.length ? { missing } : {}),
     },

@@ -108,19 +108,8 @@ a {
   border-radius: 4px;
   line-height: 1.2;
 }
-.Shirt-caption {
-  color: var(--grey);
-  font-size: 13px;
-  margin: 8px 0 0;
-  max-width: 600px;
-}
-.Shirt-caption strong {
-  color: #555;
-  font-weight: 500;
-}
-.Shirt-caption code {
-  font-family: var(--font-chivo), monospace;
-  font-size: 13px;
+.Shirt-price .label s {
+  opacity: 0.7;
 }
 
 /* Option pickers --------------------------------------------------------- */
@@ -367,29 +356,4 @@ a {
 }
 .order-page .Checkout-success dl {
   margin-left: 0;
-}
-footer {
-  margin-top: 60px;
-  color: var(--grey);
-  font-size: 12px;
-}
-
-.policy-page {
-  max-width: 760px;
-  padding-bottom: 64px;
-}
-
-.policy-page h2 {
-  margin: 32px 0;
-}
-
-.policy-page h3 {
-  margin: 28px 0 8px;
-}
-
-.policy-page p {
-  line-height: 1.65;
-}
-footer a {
-  color: var(--grey);
 }

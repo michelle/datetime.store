@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { formatPrice, PRICE_CENTS, type ShirtStyle } from "@/lib/products";
+import { COMPARE_AT_CENTS, formatPrice, PRICE_CENTS, type ShirtStyle } from "@/lib/products";
 
 interface ShirtProps {
   style: ShirtStyle;
@@ -49,22 +49,12 @@ export default function Shirt({ style, frozenAt }: ShirtProps) {
         <div className="Shirt-price">
           <h2 style={{ margin: 0 }}>
             <span className="label">
+              <s>{formatPrice(COMPARE_AT_CENTS)}</s>{" "}
               {formatPrice(PRICE_CENTS)}
             </span>
           </h2>
         </div>
       </div>
-      <p className="Shirt-caption">
-        {frozenAt === null ? (
-          <>
-            That number is the <strong>current Unix time in milliseconds</strong>. It stops the instant you buy, and that exact moment is what gets printed on your shirt. Free shipping.
-          </>
-        ) : (
-          <>
-            Frozen at <code>{frozenAt}</code> — {new Date(frozenAt).toLocaleString()}. That is your shirt.
-          </>
-        )}
-      </p>
     </div>
   );
 }

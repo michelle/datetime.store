@@ -12,15 +12,13 @@ import {
 import type { StripeExpressCheckoutElementConfirmEvent, StripeExpressCheckoutElementReadyEvent } from "@stripe/stripe-js";
 import {
   ALLOWED_COUNTRIES,
-  formatPrice,
-  PRICE_CENTS,
   SIZES,
-  STYLE_DESCRIPTIONS,
   STYLE_LABELS,
   STYLES,
   type ShirtSize,
   type ShirtStyle,
 } from "@/lib/products";
+import { ORIGINAL_COPY } from "@/lib/copy";
 
 export interface CompletedOrder {
   paymentIntentId: string;
@@ -184,37 +182,15 @@ export default function Checkout(props: CheckoutProps) {
   if (completed) {
     return (
       <div className="Checkout-success" role="status">
-        <p className="Checkout-success-title">Congrats on your pretty cool shirt!</p>
-        <p>Your shirt says</p>
-        <div className="stamp">{completed.timestamp}</div>
-        <p>
-          which is {new Date(completed.timestamp).toLocaleString()}. Your receipt is on its way to <strong>{completed.email}</strong>.
-        </p>
+        <p className="Checkout-success-title">{ORIGINAL_COPY.successTitle}</p>
+        <p>{ORIGINAL_COPY.successBody}</p>
         {completed.fulfillmentError ? (
           <div className="alert alert-warning">
             Payment received, but the print order is still being placed: {completed.fulfillmentError} We will retry automatically; keep your order id below.
           </div>
         ) : null}
-        <dl>
-          <dt>Order</dt>
-          <dd>
-            <a href={`/order?payment_intent=${encodeURIComponent(completed.paymentIntentId)}&payment_intent_client_secret=${encodeURIComponent(completed.clientSecret)}`}>
-              View order status
-            </a>
-          </dd>
-          {completed.prodigiOrderId ? (
-            <>
-              <dt>Print order</dt>
-              <dd>{completed.prodigiOrderId}</dd>
-            </>
-          ) : null}
-          <dt>Shirt</dt>
-          <dd>
-            {STYLE_LABELS[style]}, size {size}
-          </dd>
-        </dl>
         <button type="button" className="btn" onClick={onReset} style={{ marginTop: 28 }}>
-          ♥ Get another shirt
+          ♥ {ORIGINAL_COPY.buyAnother}
         </button>
       </div>
     );
@@ -242,9 +218,6 @@ export default function Checkout(props: CheckoutProps) {
           </div>
         ))}
       </fieldset>
-      <p className="option-hint">
-        {STYLE_DESCRIPTIONS[style]}, black. Ships to {ALLOWED_COUNTRIES.join(", ")} only.
-      </p>
 
       {!ready ? (
         <div aria-busy="true">
@@ -276,12 +249,11 @@ export default function Checkout(props: CheckoutProps) {
           onConfirm={handleExpressConfirm}
           onCancel={() => onUnfreeze()}
         />
-        {expressReady ? <div className="Checkout-divider">or enter details manually</div> : null}
+        {expressReady ? <div className="Checkout-divider">{ORIGINAL_COPY.manualCheckout}</div> : null}
       </div>
 
       <form onSubmit={handleSubmit} noValidate>
         <div className="Checkout-section">
-          <p className="Checkout-section-title">Shipping</p>
           <AddressElement
             options={{
               mode: "shipping",
@@ -311,19 +283,11 @@ export default function Checkout(props: CheckoutProps) {
           />
         </div>
         <div className="Checkout-section">
-          <p className="Checkout-section-title">Email (for receipt)</p>
+          <p className="Checkout-section-title">{ORIGINAL_COPY.emailLabel}</p>
           <LinkAuthenticationElement onChange={(e) => setEmail(e.value.email)} />
         </div>
         <div className="Checkout-section">
-          <p className="Checkout-section-title">Payment</p>
           <PaymentElement options={{ layout: "tabs", wallets: { link: "never" } }} onReady={() => setPaymentReady(true)} />
-        </div>
-
-        <div className="Checkout-total">
-          <span>
-            1 shirt <span className="muted">· free shipping</span>
-          </span>
-          <strong>{formatPrice(PRICE_CENTS)}</strong>
         </div>
 
         {error ? (
@@ -335,16 +299,12 @@ export default function Checkout(props: CheckoutProps) {
         <button type="submit" className="btn" disabled={busy || !ready || !paymentReady}>
           {busy ? (
             <>
-              <span className="spinner" aria-hidden="true" /> Processing…
+              <span className="spinner" aria-hidden="true" /> {ORIGINAL_COPY.processing}
             </>
           ) : (
-            "Buy now"
+            ORIGINAL_COPY.buy
           )}
         </button>
-        <p className="fine-print">
-          The clock stops the moment you press Buy now; that millisecond is what we print. Printed on demand and shipped free. Change-of-mind returns are not accepted.
-          See our <a href="/policies">shipping, return, and privacy policies</a>.
-        </p>
       </form>
     </div>
   );
