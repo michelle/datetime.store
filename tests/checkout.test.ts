@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { parseCheckoutInput, ValidationError } from "../lib/checkout";
 import { isValidTimestamp, parseTimestampParam, ARTWORK_PX } from "../lib/artwork";
-import { PRODIGI_SKUS, prodigiSize, formatPrice } from "../lib/products";
+import { PRICE_CENTS, PRODIGI_SKUS, prodigiSize, formatPrice } from "../lib/products";
 
 const valid = () => ({
   style: "unisex",
@@ -58,5 +58,6 @@ test("product mapping", () => {
   assert.equal(PRODIGI_SKUS.fitted, "GLOBAL-TEE-BC-6004");
   assert.equal(PRODIGI_SKUS.unisex, "GLOBAL-TEE-BC-3001");
   assert.equal(prodigiSize("XL"), "xl");
-  assert.equal(formatPrice(2250), "$22.50");
+  assert.equal(PRICE_CENTS, 3000);
+  assert.equal(formatPrice(PRICE_CENTS), "$30.00");
 });

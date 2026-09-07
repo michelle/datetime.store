@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { COMPARE_AT_CENTS, formatPrice, PRICE_CENTS, type ShirtStyle } from "@/lib/products";
+import { formatPrice, PRICE_CENTS, type ShirtStyle } from "@/lib/products";
 
 interface ShirtProps {
   style: ShirtStyle;
@@ -48,10 +48,7 @@ export default function Shirt({ style, frozenAt }: ShirtProps) {
         </svg>
         <div className="Shirt-price">
           <h2 style={{ margin: 0 }}>
-            <span className="label">
-              <s>{formatPrice(COMPARE_AT_CENTS)}</s>{" "}
-              {formatPrice(PRICE_CENTS)}
-            </span>
+            <span className="label">{formatPrice(PRICE_CENTS)}</span>
           </h2>
         </div>
       </div>

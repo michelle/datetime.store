@@ -16,8 +16,7 @@ export type ShirtSize = (typeof SIZES)[number];
 
 export const CURRENCY = "usd";
 /** Price in the smallest currency unit (cents). */
-export const PRICE_CENTS = 2250;
-export const COMPARE_AT_CENTS = 3000;
+export const PRICE_CENTS = 3000;
 export const SHIRT_COLOR = "black";
 
 /** Countries we ship to. Prodigi ships worldwide but pricing/tax here assumes US. */
