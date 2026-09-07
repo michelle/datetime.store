@@ -16,7 +16,8 @@ export async function GET() {
   const validAppEnv = process.env.APP_ENV === "sandbox" || process.env.APP_ENV === "production";
   const live = process.env.APP_ENV === "production";
   const stripeModeMatches = live
-    ? process.env.STRIPE_SECRET_KEY?.startsWith("sk_live_") && process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.startsWith("pk_live_")
+    ? (process.env.STRIPE_SECRET_KEY?.startsWith("sk_live_") || process.env.STRIPE_SECRET_KEY?.startsWith("rk_live_")) &&
+      process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.startsWith("pk_live_")
     : (process.env.STRIPE_SECRET_KEY?.startsWith("sk_test_") || process.env.STRIPE_SECRET_KEY?.startsWith("rkcs_test_")) &&
       process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.startsWith("pk_test_");
   const expectedProdigiBase = live ? "https://api.prodigi.com/v4.0" : "https://api.sandbox.prodigi.com/v4.0";
