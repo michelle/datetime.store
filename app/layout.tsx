@@ -9,6 +9,10 @@ export const metadata: Metadata = {
   title: ORIGINAL_COPY.pageTitle,
   description: ORIGINAL_COPY.tagline,
   metadataBase: process.env.SITE_URL ? new URL(process.env.SITE_URL) : undefined,
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    shortcut: "/icon.svg",
+  },
   openGraph: {
     title: ORIGINAL_COPY.pageTitle,
     description: ORIGINAL_COPY.tagline,
